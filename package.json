@@ -1,7 +1,7 @@
 {
     "name": "gulp-subset-process",
-    "description": "Process a subset of the stream and put the result in place",
-    "version": "0.0.0",
+    "description": "Process a subset of the stream and put the result into place",
+    "version": "0.0.1",
     "homepage": "https://github.com/hoho/gulp-subset-process",
     "repository": "git://github.com/hoho/gulp-subset-process.git",
     "author": "Marat Abdullin <dakota@brokenpipe.ru>",
