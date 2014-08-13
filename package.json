@@ -1,0 +1,35 @@
+{
+    "name": "gulp-subset-process",
+    "description": "Process a subset of the stream and put the result in place",
+    "version": "0.0.0",
+    "homepage": "https://github.com/hoho/gulp-subset-process",
+    "repository": "git://github.com/hoho/gulp-subset-process.git",
+    "author": "Marat Abdullin <dakota@brokenpipe.ru>",
+    "license": "MIT",
+    "main": "./index.js",
+    "keywords": [
+        "gulpplugin",
+        "filter",
+        "subset",
+        "order"
+    ],
+    "bugs": {
+        "url": "https://github.com/hoho/gulp-subset-process/issues"
+    },
+    "dependencies": {
+        "gulp-util": "~3.0.0",
+        "through": "~2.3.4",
+        "multimatch": "~0.3.0"
+    },
+    "devDependencies": {
+        "mocha": "*",
+        "should": "*",
+        "gulp-add": "~0.0.2"
+    },
+    "scripts": {
+        "test": "mocha"
+    },
+    "engines": {
+        "node": ">=0.10"
+    }
+}
