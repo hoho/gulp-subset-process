@@ -15,6 +15,7 @@ module.exports = function(pattern, subtask, options) {
         filesBetween = [],
         filesAfter = [],
         files = [],
+        filesKeep = [],
         hasMatch;
 
     pattern = typeof pattern === 'string' ? [pattern] : pattern;
@@ -40,15 +41,29 @@ module.exports = function(pattern, subtask, options) {
         if (file.isStream()) { return this.emit('error', new PluginError('gulp-subset-process',  'Streaming not supported')); }
 
         if (multimatch(file.relative, pattern, options).length > 0) {
-            hasMatch = true;
-            filesAfter = [];
-            files.push(file);
-        } else {
-            if (hasMatch) {
-                filesBetween.push(file);
-                filesAfter.push(file);
+            if (options.occurrence === 'keep') {
+                filesKeep.push({
+                    file: file,
+                    match: true
+                });
             } else {
-                filesBefore.push(file);
+                hasMatch = true;
+                filesAfter = [];
+                files.push(file);
+            }
+        } else {
+            if (options.occurrence === 'keep') {
+                filesKeep.push({
+                    file: file,
+                    match: false
+                });
+            } else {
+                if (hasMatch) {
+                    filesBetween.push(file);
+                    filesAfter.push(file);
+                } else {
+                    filesBefore.push(file);
+                }
             }
         }
     }
@@ -57,40 +72,68 @@ module.exports = function(pattern, subtask, options) {
         try {
             var self = this;
 
-            filesBetween.splice(filesBetween.length - filesAfter.length, filesAfter.length);
+            if (options.occurrence === 'keep') {
+                (function processFile() {
+                    var fileWrapper = filesKeep.shift();
 
-            filesBefore.forEach(function(file) {
-                self.emit('data', file);
-            });
+                    if (fileWrapper) {
+                        if (fileWrapper.match) {
+                            var subtaskStream = through();
+                            var ret = subtask(subtaskStream);
 
-            if (options.occurrence === 'last') {
-                filesBetween.forEach(function(file) {
+                            ret.on('data', function(file) {
+                                self.emit('data', file);
+                            });
+                            ret.on('end', function() {
+                                processFile();
+                            });
+
+                            subtaskStream.emit('data', fileWrapper.file);
+                            subtaskStream.emit('end');
+                        } else {
+                            self.emit('data', fileWrapper.file);
+                            processFile();
+                        }
+                    } else {
+                        self.emit('end');
+                    }
+                })();
+            } else {
+                filesBetween.splice(filesBetween.length - filesAfter.length, filesAfter.length);
+
+                filesBefore.forEach(function(file) {
                     self.emit('data', file);
                 });
-            }
 
-            var subtaskStream = through();
-            var ret = subtask(subtaskStream);
-            ret.on('data', function(file) {
-                self.emit('data', file);
-            });
-            ret.on('end', function() {
-                if (options.occurrence !== 'last') {
-                    filesBetween.forEach(function (file) {
+                if (options.occurrence === 'last') {
+                    filesBetween.forEach(function(file) {
                         self.emit('data', file);
                     });
                 }
-                filesAfter.forEach(function(file) {
+
+                var subtaskStream = through();
+                var ret = subtask(subtaskStream);
+                ret.on('data', function(file) {
                     self.emit('data', file);
                 });
-                self.emit('end');
-            });
+                ret.on('end', function() {
+                    if (options.occurrence === 'first') {
+                        filesBetween.forEach(function(file) {
+                            self.emit('data', file);
+                        });
+                    }
+                    filesAfter.forEach(function(file) {
+                        self.emit('data', file);
+                    });
+                    self.emit('end');
+                });
 
-            files.forEach(function(file) {
-                subtaskStream.emit('data', file);
-            });
+                files.forEach(function(file) {
+                    subtaskStream.emit('data', file);
+                });
 
-            subtaskStream.emit('end');
+                subtaskStream.emit('end');
+            }
         } catch(e) {
             return this.emit('error', new PluginError('gulp-subset-process', e.message));
         }

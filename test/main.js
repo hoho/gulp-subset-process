@@ -38,6 +38,19 @@ describe('gulp-subset-process', function() {
         );
 
         testSubsetProcess(
+            ['file4.txt', 'file2.txt'],
+            function(src) { return src; },
+            {occurrence: 'keep'},
+            [
+                'file1.js', 'file: file1.js',
+                'file2.txt', 'file: file2.txt',
+                'file3.css', 'file: file3.css',
+                'file4.txt', 'file: file4.txt',
+                'file5.jpg', 'file: file5.jpg'
+            ]
+        );
+
+        testSubsetProcess(
             '**/*.txt',
             function(src) { return src.pipe(add('tmp.txt', 'file: tmp.txt')); },
             undefined,
@@ -61,6 +74,26 @@ describe('gulp-subset-process', function() {
                 'tmp.txt', 'file: tmp.txt',
                 'file2.txt', 'file: file2.txt',
                 'file4.txt', 'file: file4.txt',
+                'file5.jpg', 'file: file5.jpg'
+            ]
+        );
+
+        testSubsetProcess(
+            '**/*.txt',
+            function(src) { return src
+                .pipe(add('tmp.txt', 'file: tmp.txt', true))
+                .pipe(add('tmp2.txt', 'file: tmp2.txt'));
+            },
+            {occurrence: 'keep'},
+            [
+                'file1.js', 'file: file1.js',
+                'tmp.txt', 'file: tmp.txt',
+                'file2.txt', 'file: file2.txt',
+                'tmp2.txt', 'file: tmp2.txt',
+                'file3.css', 'file: file3.css',
+                'tmp.txt', 'file: tmp.txt',
+                'file4.txt', 'file: file4.txt',
+                'tmp2.txt', 'file: tmp2.txt',
                 'file5.jpg', 'file: file5.jpg'
             ]
         );
