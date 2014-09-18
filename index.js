@@ -19,6 +19,13 @@ module.exports = function(pattern, subtask, options) {
 
     pattern = typeof pattern === 'string' ? [pattern] : pattern;
     options = options || {};
+    if (!options.occurrence) {
+        options.occurrence = 'first';
+    }
+
+    if (!{first: true, last: true, keep: true}[options.occurrence]) {
+        throw new PluginError('gulp-subset-process', 'Invalid `occurrence` option value');
+    }
 
     if (!(pattern instanceof Array)) {
         throw new PluginError('gulp-subset-process', '`pattern` should be string or array');
@@ -56,7 +63,7 @@ module.exports = function(pattern, subtask, options) {
                 self.emit('data', file);
             });
 
-            if (options.afterLastOccurrence) {
+            if (options.occurrence === 'last') {
                 filesBetween.forEach(function(file) {
                     self.emit('data', file);
                 });
@@ -68,7 +75,7 @@ module.exports = function(pattern, subtask, options) {
                 self.emit('data', file);
             });
             ret.on('end', function() {
-                if (!options.afterLastOccurrence) {
+                if (options.occurrence !== 'last') {
                     filesBetween.forEach(function (file) {
                         self.emit('data', file);
                     });

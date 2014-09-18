@@ -27,7 +27,7 @@ describe('gulp-subset-process', function() {
         testSubsetProcess(
             ['file4.txt', 'file2.txt'],
             function(src) { return src; },
-            {afterLastOccurrence: true},
+            {occurrence: 'last'},
             [
                 'file1.js', 'file: file1.js',
                 'file3.css', 'file: file3.css',
@@ -54,7 +54,7 @@ describe('gulp-subset-process', function() {
         testSubsetProcess(
             '**/*.txt',
             function(src) { return src.pipe(add('tmp.txt', 'file: tmp.txt', true)); },
-            {afterLastOccurrence: true},
+            {occurrence: 'last'},
             [
                 'file1.js', 'file: file1.js',
                 'file3.css', 'file: file3.css',
