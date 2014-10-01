@@ -1,4 +1,4 @@
-# gulp-subset-process
+# gulp-subset-process [![Build Status](https://travis-ci.org/hoho/gulp-subset-process.svg?branch=master)](https://travis-ci.org/hoho/gulp-subset-process)
 
 Process a subset of the stream and put the result into place. When order
 matters.
